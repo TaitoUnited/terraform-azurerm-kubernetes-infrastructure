@@ -15,7 +15,7 @@
  */
 
 resource "helm_release" "postgres_proxy" {
-  depends_on = [azurerm_kubernetes_cluster.kubernetes]
+  depends_on = [azurerm_kubernetes_cluster.kubernetes, helm_release.letsencrypt_issuer]
   count      = var.helm_enabled ? length(var.postgres_instances) : 0
 
   name       = var.postgres_instances[count.index]
@@ -38,7 +38,7 @@ resource "helm_release" "postgres_proxy" {
 
 /* TODO: MySQL
 resource "helm_release" "mysql_proxy" {
-  depends_on = [azurerm_kubernetes_cluster.kubernetes]
+  depends_on = [azurerm_kubernetes_cluster.kubernetes, helm_release.postgres_proxy]
   count      = var.helm_enabled ? length(var.mysql_instances) : 0
 
   name       = var.mysql_instances[count.index]
