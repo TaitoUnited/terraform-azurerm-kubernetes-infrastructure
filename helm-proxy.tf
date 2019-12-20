@@ -22,7 +22,7 @@ resource "helm_release" "postgres_proxy" {
   namespace  = "db-proxy"
   repository = "https://kubernetes-charts.storage.googleapis.com/"
   chart      = "socat-tunneller"
-  version    = "0.1.0"
+  version    = local.socat_tunneler_version
   wait       = false
 
   set {
@@ -45,7 +45,7 @@ resource "helm_release" "mysql_proxy" {
   namespace  = "db-proxy"
   repository = "https://kubernetes-charts.storage.googleapis.com/"
   chart      = "socat-tunneller"
-  version    = "0.1.0"
+  version    = local.socat_tunneler_version
   wait       = false
 
   set {
