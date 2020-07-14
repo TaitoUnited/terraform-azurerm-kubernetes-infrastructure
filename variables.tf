@@ -67,7 +67,11 @@ variable "projects_bucket" {
   description = "Name of storage bucket used for storing function packages, etc."
 }
 
-# TODO: assets_bucket
+variable "assets_bucket" {
+  type         = string
+  default     = ""
+  description = "Name of storage bucket used for storing public assets, etc."
+}
 
 /* Helm */
 

@@ -27,6 +27,7 @@ resource "azurerm_storage_account" "zone" {
 }
 
 resource "azurerm_storage_container" "state" {
+  count                 = var.state_bucket != "" ? 1 : 0
   name                  = var.state_bucket
   storage_account_name  = azurerm_storage_account.zone.name
   container_access_type = "private"
@@ -37,9 +38,26 @@ resource "azurerm_storage_container" "state" {
 }
 
 resource "azurerm_storage_container" "projects" {
+  count                 = var.projects_bucket != "" ? 1 : 0
   name                  = var.projects_bucket
   storage_account_name  = azurerm_storage_account.zone.name
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_storage_container" "assets" {
+  count                 = var.assets_bucket != "" ? 1 : 0
+  name                  = var.assets_bucket
+  storage_account_name  = azurerm_storage_account.zone.name
+  container_access_type = "blob"
+
+  cors_rule {
+    allowed_origins = [ "*" ]
+    allowed_methods = ["GET", "HEAD"]
+  }
 
   lifecycle {
     prevent_destroy = true
