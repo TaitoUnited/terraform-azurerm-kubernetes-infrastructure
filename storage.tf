@@ -48,9 +48,9 @@ resource "azurerm_storage_container" "projects" {
   }
 }
 
-resource "azurerm_storage_container" "assets" {
-  count                 = var.assets_bucket != "" ? 1 : 0
-  name                  = var.assets_bucket
+resource "azurerm_storage_container" "public" {
+  count                 = var.public_bucket != "" ? 1 : 0
+  name                  = var.public_bucket
   storage_account_name  = azurerm_storage_account.zone.name
   container_access_type = "blob"
 
