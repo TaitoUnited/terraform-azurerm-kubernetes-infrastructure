@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Taito United
+ * Copyright 2020 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,41 +15,41 @@
  */
 
 resource "random_string" "postgresql_admin_password" {
-  count               = length(var.postgres_instances)
+  count               = length(local.postgresClusters)
 
   length  = 32
   special = false
   upper   = true
 
   keepers = {
-    username = var.postgres_admins[count.index]
+    username = local.postgresClusters[count.index].adminUsername
   }
 }
 
 resource "azurerm_postgresql_server" "pg" {
-  count               = length(var.postgres_instances)
+  count               = length(local.postgresClusters)
 
-  name                = var.postgres_instances[count.index]
+  name                = local.postgresClusters[count.index].name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 
   sku {
-    name     = var.postgres_sku_names[count.index]
-    capacity = var.postgres_sku_capacities[count.index]
-    tier     = var.postgres_sku_tiers[count.index]
-    family   = var.postgres_sku_families[count.index]
+    name     = local.postgresClusters[count.index].skuName
+    capacity = local.postgresClusters[count.index].skuCapacity
+    tier     = local.postgresClusters[count.index].skuTiers
+    family   = local.postgresClusters[count.index].skuFamily
   }
 
   storage_profile {
-    storage_mb            = var.postgres_storage_sizes[count.index]
-    backup_retention_days = var.postgres_backup_retention_days[count.index]
-    geo_redundant_backup  = var.postgres_geo_redundant_backups[count.index]
-    auto_grow             = var.postgres_auto_grows[count.index]
+    storage_mb            = local.postgresClusters[count.index].storageSize
+    backup_retention_days = local.postgresClusters[count.index].backupRetentionDays
+    geo_redundant_backup  = local.postgresClusters[count.index].geoRedundantBackupEnabled ? "Enabled" : "Disabled"
+    auto_grow             = local.postgresClusters[count.index].autoGrowEnabled ? "Enabled" : "Disabled"
   }
 
-  administrator_login          = var.postgres_admins[count.index]
+  administrator_login          = local.postgresClusters[count.index].adminUsername
   administrator_login_password = random_string.postgresql_admin_password[count.index].result
-  version                      = var.postgres_versions[count.index]
+  version                      = local.postgresClusters[count.index].version
   ssl_enforcement              = "Enabled"
 
   lifecycle {
@@ -59,7 +59,7 @@ resource "azurerm_postgresql_server" "pg" {
 
 /* TODO: Open postgres firewall also for some external addresses
 resource "azurerm_sql_firewall_rule" "postgres_external_access" {
-  count               = var.kubernetes_name != "" ? length(var.postgres_instances) : 0
+  count               = local.kubernetes.name != "" ? length(local.postgresClusters) : 0
   name                = "postgres-external-access"
   resource_group_name = var.resource_group_name
 
@@ -70,7 +70,7 @@ resource "azurerm_sql_firewall_rule" "postgres_external_access" {
 */
 
 resource "azurerm_postgresql_virtual_network_rule" "pg" {
-  count                                = length(var.postgres_instances)
+  count                                = length(local.postgresClusters)
 
   name                                 = "${azurerm_postgresql_server.pg[count.index].name}-vnet-rule"
   resource_group_name                  = var.resource_group_name

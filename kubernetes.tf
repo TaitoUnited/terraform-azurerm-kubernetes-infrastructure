@@ -1,5 +1,5 @@
 /**
- * Copyright 2019 Taito United
+ * Copyright 2020 Taito United
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,23 @@
  */
 
 resource "azuread_application" "kubernetes" {
-  count                      = var.kubernetes_name != "" ? 1 : 0
+  count                      = local.kubernetes.name != "" ? 1 : 0
 
-  name                       = "${var.name}-${var.kubernetes_name}"
-  identifier_uris            = ["http://${var.kubernetes_name}.${var.name}"]
+  name                       = "${var.name}-${local.kubernetes.name}"
+  identifier_uris            = ["http://${local.kubernetes.name}.${var.name}"]
   available_to_other_tenants = false
   oauth2_allow_implicit_flow = false
 }
 
 resource "azuread_service_principal" "kubernetes" {
-  count   = var.kubernetes_name != "" ? 1 : 0
+  count   = local.kubernetes.name != "" ? 1 : 0
 
   application_id = azuread_application.kubernetes[count.index].application_id
-  tags = ["aks", "kubernetes", "terraform", var.kubernetes_name, var.name]
+  tags = ["aks", "kubernetes", "terraform", local.kubernetes.name, var.name]
 }
 
 resource "random_string" "kubernetes_password" {
-  count   = var.kubernetes_name != "" ? 1 : 0
+  count   = local.kubernetes.name != "" ? 1 : 0
 
   length  = 32
   special = false
@@ -43,7 +43,7 @@ resource "random_string" "kubernetes_password" {
 }
 
 resource "azuread_service_principal_password" "kubernetes" {
-  count                = var.kubernetes_name != "" ? 1 : 0
+  count                = local.kubernetes.name != "" ? 1 : 0
 
   service_principal_id = azuread_service_principal.kubernetes[count.index].id
   value                = random_string.kubernetes_password[count.index].result
@@ -51,19 +51,20 @@ resource "azuread_service_principal_password" "kubernetes" {
 }
 
 resource "azurerm_kubernetes_cluster" "kubernetes" {
-  count   = var.kubernetes_name != "" ? 1 : 0
+  count   = local.kubernetes.name != "" ? 1 : 0
 
-  name                = var.kubernetes_name
-  dns_prefix          = var.kubernetes_name
+  name                = local.kubernetes.name
+  dns_prefix          = local.kubernetes.name
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name
 
-  api_server_authorized_ip_ranges = var.kubernetes_authorized_networks
+  api_server_authorized_ip_ranges = local.kubernetes.masterAuthorizedNetworks
 
+  # TODO: support for multiple pools and min/max count
   default_node_pool {
     name            = "default"
-    vm_size         = var.kubernetes_node_size
-    node_count      = var.kubernetes_node_count
+    vm_size         = local.kubernetes.nodePools[0].machineType
+    node_count      = local.kubernetes.nodePools[0].minNodeCount
     vnet_subnet_id  = var.kubernetes_subnet_id
   }
 
