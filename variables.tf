@@ -80,3 +80,10 @@ variable "postgres_subnet_id" {
   type        = string
   description = "Subnet id for PostgreSQL clusters."
 }
+
+# Resources as a json/yaml
+
+variable "resources" {
+  type        = any
+  description = "Resources as JSON (see README.md). You can read values from a YAML file with yamldecode()."
+}

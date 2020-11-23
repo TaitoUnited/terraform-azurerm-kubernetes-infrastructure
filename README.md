@@ -34,7 +34,7 @@ kubernetes:
       diskSizeGb: 100
       minNodeCount: 2
       maxNodeCount: 2
-  nginxIngressControllers:
+  ingressNginxControllers:
     - class: nginx
       replicas: 2
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-resource "helm_release" "nginx_ingress" {
+resource "helm_release" "ingress_nginx" {
   depends_on = [azurerm_kubernetes_cluster.kubernetes]
 
-  count = var.helm_enabled ? length(local.nginxIngressControllers) : 0
+  count = var.helm_enabled ? length(local.ingressNginxControllers) : 0
 
-  name       = "nginx-ingress"
-  namespace  = "nginx-ingress"
+  name       = "ingress-nginx"
+  namespace  = "ingress-nginx"
   repository = "https://kubernetes-charts.storage.googleapis.com/"
-  chart      = "nginx-ingress"
-  version    = local.nginx_ingress_version
+  chart      = "ingress-nginx"
+  version    = local.ingress_nginx_version
   wait       = false
 
   set {
@@ -43,12 +43,12 @@ resource "helm_release" "nginx_ingress" {
 
   set {
     name     = "controller.ingressClass"
-    value    = local.nginxIngressControllers[count.index].class
+    value    = local.ingressNginxControllers[count.index].class
   }
 
   set {
     name     = "controller.replicaCount"
-    value    = local.nginxIngressControllers[count.index].replicas
+    value    = local.ingressNginxControllers[count.index].replicas
   }
 
   set {
@@ -70,7 +70,7 @@ resource "helm_release" "nginx_ingress" {
 }
 
 resource "helm_release" "cert_manager_crd" {
-  depends_on = [azurerm_kubernetes_cluster.kubernetes, helm_release.nginx_ingress]
+  depends_on = [azurerm_kubernetes_cluster.kubernetes, helm_release.ingress_nginx]
 
   count = var.helm_enabled ? 1 : 0
 

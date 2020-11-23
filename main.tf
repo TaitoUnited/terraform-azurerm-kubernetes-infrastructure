@@ -26,67 +26,67 @@ provider "helm" {
 }
 
 locals {
-  nginx_ingress_version      = "1.26.2"
+  ingress_nginx_version      = "1.26.2"
   cert_manager_version       = "0.11.0"
   socat_tunneler_version     = "0.1.0"
 
   authorizedNetworks = [
-    for net in try(var.variables.authorizedNetworks, []):
+    for net in try(var.resources.authorizedNetworks, []):
     net.cidr
   ]
 
   owners = try(
-    var.variables.owners != null ? var.variables.owners : [], []
+    var.resources.owners != null ? var.resources.owners : [], []
   )
 
   /* TODO
   editors = try(
-    var.variables.editors != null ? var.variables.editors : [], []
+    var.resources.editors != null ? var.resources.editors : [], []
   )
   */
 
   /* TODO
   viewers = try(
-    var.variables.viewers != null ? var.variables.viewers : [], []
+    var.resources.viewers != null ? var.resources.viewers : [], []
   )
   */
 
   developers = try(
-    var.variables.developers != null ? var.variables.developers : [], []
+    var.resources.developers != null ? var.resources.developers : [], []
   )
 
   /* TODO
   externals = try(
-    var.variables.externals != null ? var.variables.externals : [], []
+    var.resources.externals != null ? var.resources.externals : [], []
   )
   */
 
-  kubernetes = var.variables.kubernetes
+  kubernetes = var.resources.kubernetes
 
   nodePools = try(
-    var.variables.kubernetes.nodePools != null
-    ? var.variables.kubernetes.nodePools
+    var.resources.kubernetes.nodePools != null
+    ? var.resources.kubernetes.nodePools
     : [],
     []
   )
 
-  nginxIngressControllers = try(
-    var.variables.kubernetes.nginxIngressControllers != null
-    ? var.variables.kubernetes.nginxIngressControllers
+  ingressNginxControllers = try(
+    var.resources.kubernetes.ingressNginxControllers != null
+    ? var.resources.kubernetes.ingressNginxControllers
     : [],
     []
   )
 
   postgresClusters = try(
-    var.variables.postgresClusters != null
-    ? var.variables.postgresClusters
+    var.resources.postgresClusters != null
+    ? var.resources.postgresClusters
     : [],
     []
   )
 
   mysqlClusters = try(
-    var.variables.mysqlClusters != null
-    ? var.variables.mysqlClusters
+    var.resources.mysqlClusters != null
+    ? var.resources.mysqlClusters
     : [],
     []
   )
