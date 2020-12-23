@@ -15,5 +15,22 @@
  */
 
 terraform {
-  required_version = ">= 0.12"
+  required_version = ">= 0.13"
+  required_providers {
+    azuread = {
+      source = "hashicorp/azuread"
+    }
+    azurerm = {
+      source = "hashicorp/azurerm"
+    }
+    helm = {
+      source = "hashicorp/helm"
+    }
+    null = {
+      source = "hashicorp/null"
+    }
+    random = {
+      source = "hashicorp/random"
+    }
+  }
 }
