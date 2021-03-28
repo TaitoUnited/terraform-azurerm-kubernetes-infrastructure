@@ -15,6 +15,7 @@
  */
 
 provider "azurerm" {
+  features {}
 }
 
 provider "helm" {

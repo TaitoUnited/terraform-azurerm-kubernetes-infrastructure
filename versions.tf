@@ -15,5 +15,16 @@
  */
 
 terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=1.44.0"
+    }
+    helm = {
+      source = "hashicorp/helm"
+      version = "=0.10.6"
+    }
+  }
+
   required_version = ">= 0.12"
 }
